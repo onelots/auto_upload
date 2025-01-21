@@ -69,7 +69,7 @@ Finally, you can upload the files with `upload`.
 
 ## :handshake: Contact
 
-![Discord Badge](https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=fff&style=flat) : `onelots.`
+![Discord Badge](https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=fff&style=flat) : `onelots`
 
 ![Mail Badge](https://img.shields.io/badge/Mail-D14836?logo=gmail&logoColor=fff&style=flat) : `onelots@onelots.fr`
 
