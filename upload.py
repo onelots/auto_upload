@@ -59,7 +59,7 @@ def upload_device(device):
     rom = config[device]["rom"]
     android_version = get_android_ver(device)
     zips = [f for f in os.listdir(out) if f.endswith(".zip") and "ota-eng" not in f]
-    rom_zip = max(zips, key=lambda f: os.path.getmtime(f"{out}/{f}"))
+    rom_zip = max(zips, key=lambda f: re.search(r'\d{8}', f).group())
     major_version = re.findall(r'\d+\.\d+', rom_zip)[-1]
     build_date = re.search(r'\d{8}', rom_zip).group()
     upload_path=f"{rom}/{device}/{android_version}/{major_version}/{build_date}"
