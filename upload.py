@@ -7,8 +7,10 @@ import subprocess
 import re
 
 pwd = os.getenv("PWD")
+top = os.getenv("ANDROID_BUILD_TOP")
+out = os.getenv("ANDROID_PRODUCT_OUT")
 rclone_conf = os.path.expanduser("~/.config/rclone/rclone.conf")
-devices_conf = f"{pwd}/auto_upload/devices.conf"
+devices_conf = f"~/auto_upload/devices.conf"
 config = configparser.ConfigParser()
 base_out = "out/target/product/"
 
@@ -55,10 +57,9 @@ def get_android_ver(device):
 
 def upload_device(device):
     rom = config[device]["rom"]
-    base_path = base_out + device + "/"
     android_version = get_android_ver(device)
-    zips = [f for f in os.listdir(base_path) if f.endswith(".zip") and "ota-eng" not in f]
-    rom_zip = max(zips, key=lambda f: os.path.getmtime(f"{base_path}/{f}"))
+    zips = [f for f in os.listdir(out) if f.endswith(".zip") and "ota-eng" not in f]
+    rom_zip = max(zips, key=lambda f: os.path.getmtime(f"{out}/{f}"))
     major_version = re.findall(r'\d+\.\d+', rom_zip)[-1]
     build_date = re.search(r'\d{8}', rom_zip).group()
     upload_path=f"{rom}/{device}/{android_version}/{major_version}/{build_date}"
@@ -71,7 +72,7 @@ def upload_device(device):
     for image in install_images:
         if not image.endswith(".zip"):
             image = f"{image}.img"
-        subprocess.run(["rclone", "copy", f"{base_path}/{image}", f"cloudflare-onelots:{upload_path}", "-P"])
+        subprocess.run(["rclone", "copy", f"{out}/{image}", f"cloudflare-onelots:{upload_path}", "-P"])
 
 
 def read_device_config_file(file_path, built):
