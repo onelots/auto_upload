@@ -6,11 +6,11 @@ import configparser
 import subprocess
 import re
 
+pwd = os.getenv("PWD")
 rclone_conf = os.path.expanduser("~/.config/rclone/rclone.conf")
-devices_conf = "devices.conf"
+devices_conf = f"{pwd}/auto_upload/devices.conf"
 config = configparser.ConfigParser()
 base_out = "out/target/product/"
-pwd = os.getenv("PWD")
 
 
 def check_conf():
