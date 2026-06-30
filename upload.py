@@ -10,7 +10,7 @@ pwd = os.getenv("PWD")
 top = os.getenv("ANDROID_BUILD_TOP")
 out = os.getenv("ANDROID_PRODUCT_OUT")
 rclone_conf = os.path.expanduser("~/.config/rclone/rclone.conf")
-devices_conf = f"~/auto_upload/devices.conf"
+devices_conf = os.path.expanduser("~/auto_upload/devices.conf")
 config = configparser.ConfigParser()
 base_out = "out/target/product/"
 
