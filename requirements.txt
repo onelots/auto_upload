@@ -1,2 +1,1 @@
-paramiko~=3.4.1
-scp~=0.15.0
+configparser~=7.2.0
