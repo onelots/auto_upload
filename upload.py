@@ -19,7 +19,7 @@ base_out = "out/target/product/"
 
 roms_informations = {
     "roms_colors": {
-        "lineageos": "8a0034",
+        "lineageos": "167C80",
         "evolution-x": "005ffe"
     },
     "roms_images": {
