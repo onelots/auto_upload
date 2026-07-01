@@ -86,7 +86,7 @@ def send_webhook(rom, version, upload_path, device, rom_zip):
     today = date_module.today().strftime("%d/%m/%Y")
     zip_name = rom_zip.split("/")[-1]
     build_time = int(os.getenv("BUILD_TIME"))
-    time_elapsed = str(timedelta(seconds=int(time.time()) - build_time))
+    time_elapsed = str(timedelta(seconds=build_time))
     rom_image_url = roms_informations["roms_images"][rom]
     rom_color = int(roms_informations["roms_colors"][rom], 16)
     now_timestamp = datetime.utcnow().isoformat()
