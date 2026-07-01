@@ -130,8 +130,8 @@ def upload_device(device):
         if not image.endswith(".zip"):
             image = f"{image}.img"
         subprocess.run(["rclone", "copy", f"{out}/{image}", f"cloudflare-onelots:{upload_path}", "-P"])
-
-    send_webhook(rom, major_version, upload_path, device, rom_zip)
+    zip_path = f"{out}/{rom_zip}"
+    send_webhook(rom, major_version, upload_path, device, zip_path)
 
 def read_device_config_file(file_path, built):
     config.read(file_path)
