@@ -23,8 +23,8 @@ roms_informations = {
         "evolution-x": "005ffe"
     },
     "roms_images": {
-        "lineageos": "images/lineageos.png",
-        "evolution-x": "images/evolution-x.png"
+        "lineageos": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzJ5AMneN4WX2M6Xg_gapy6oQjqrZuCexIl0WhCRzSmw&s=10",
+        "evolution-x": "https://pbs.twimg.com/media/HDoKAuvbEAAuv1E.jpg"
     },
     "roms_capitalized": {
         "lineageos": "LineageOS",
