@@ -5,6 +5,9 @@ import sys
 import configparser
 import subprocess
 import re
+import time
+import requests
+from datetime import date as date_module, timedelta, datetime
 
 pwd = os.getenv("PWD")
 top = os.getenv("ANDROID_BUILD_TOP")
@@ -14,6 +17,26 @@ devices_conf = os.path.expanduser("~/auto_upload/devices.conf")
 config = configparser.ConfigParser()
 base_out = "out/target/product/"
 
+roms_informations = {
+    "roms_colors": {
+        "lineageos": "8a0034",
+        "evolution-x": "005ffe"
+    },
+    "roms_images": {
+        "lineageos": "images/lineageos.png",
+        "evolution-x": "images/evolution-x.png"
+    },
+    "roms_capitalized": {
+        "lineageos": "LineageOS",
+        "evolution-x": "EvolutionX"
+    }
+}
+
+def get_zip_size(path):
+    size = os.path.getsize(path)
+    if size >= 1_000_000_000:
+        return f"{size / 1_000_000_000:.1f} GB"
+    return f"{size / 1_000_000:.0f} MB"
 
 def check_conf():
     if not os.path.exists(rclone_conf):
@@ -25,7 +48,6 @@ def check_conf():
         print("Device conf file not found, exiting...")
         sys.exit(1)
     print("Device configuration found, proceed.")
-
 
 def get_android_ver(device):
     rom = config[device]["rom"]
@@ -51,9 +73,45 @@ def get_android_ver(device):
             aver = 16
         if "12" in pwd:
             aver = 17
-    
+
     return int(aver)
 
+def send_webhook(rom, version, upload_path, device, rom_zip):
+    webhook_url = os.getenv("WEBHOOK_URL")
+    download_url = "https://downloads.onelots.org/" + upload_path
+    rom_capitalized = roms_informations["roms_capitalized"][rom]
+    if "lineageos" in rom:
+        version = "lineageos-" + version
+    size = get_zip_size(rom_zip)
+    today = date_module.today().strftime("%d/%m/%Y")
+    zip_name = rom_zip.split("/")[-1]
+    build_time = int(os.getenv("BUILD_TIME"))
+    time_elapsed = str(timedelta(seconds=int(time.time()) - build_time))
+    rom_image_url = roms_informations["roms_images"][rom]
+    rom_color = int(roms_informations["roms_colors"][rom], 16)
+    now_timestamp = datetime.utcnow().isoformat()
+
+    json_success = {
+        "embeds": [{
+            "author": {
+                "name": f"New build for - {device}",
+                "url": "https://onelots.org/devices"
+            },
+            "title": "Build succeeded !",
+            "url": download_url,
+            "description": f"Device : `{device}`\nRom built : `{rom_capitalized}`\nVersion : `{version}`\nSize : `{size}`\nDate : `{today}`\nZip name : `{zip_name}`\nTime elapsed: `{time_elapsed}`",
+            "image": {"url": rom_image_url},
+            "color": rom_color,
+            "footer": {
+                "text": "Onelots build services",
+                "icon_url": "https://slate.dan.onl/slate.png"
+            },
+            "timestamp": now_timestamp
+        }]
+    }
+
+    response = requests.post(webhook_url, json=json_success)
+    response.raise_for_status()
 
 def upload_device(device):
     rom = config[device]["rom"]
@@ -65,15 +123,13 @@ def upload_device(device):
     upload_path=f"{rom}/{device}/{android_version}/{major_version}/{build_date}"
     install_images = config[device]["install_images"]
     install_images = [img.strip() for img in install_images.split(",")]
-    
+
     install_images.append(rom_zip)
 
-    # Upload stuff
     for image in install_images:
         if not image.endswith(".zip"):
             image = f"{image}.img"
         subprocess.run(["rclone", "copy", f"{out}/{image}", f"cloudflare-onelots:{upload_path}", "-P"])
-
 
 def read_device_config_file(file_path, built):
     config.read(file_path)
