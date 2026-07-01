@@ -78,7 +78,7 @@ def get_android_ver(device):
 
 def send_webhook(rom, version, upload_path, device, rom_zip):
     webhook_url = os.getenv("WEBHOOK_URL")
-    download_url = "https://downloads.onelots.org/" + upload_path
+    download_url = "https://downloads.onelots.org/buckets/" + upload_path
     rom_capitalized = roms_informations["roms_capitalized"][rom]
     if "lineageos" in rom:
         version = "lineageos-" + version
