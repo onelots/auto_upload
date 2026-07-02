@@ -112,6 +112,10 @@ def send_webhook(rom, version, upload_path, device, rom_zip):
 
     response = requests.post(webhook_url, json=json_success)
     response.raise_for_status()
+    print("---------------------------------------------------")
+    print("|            Webhook sent successfully            |")
+    print("---------------------------------------------------")
+
 
 def upload_device(device):
     rom = config[device]["rom"]
