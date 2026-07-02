@@ -66,7 +66,7 @@ def get_android_ver(device):
             aver = 16
         if "lineage-24" in pwd:
             aver = 17
-    if "evolutionx" in rom:
+    if "evolution-x" in rom:
         if "10" in pwd:
             aver = 15
         if "11" in pwd:
