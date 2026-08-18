@@ -124,7 +124,7 @@ def upload_device(device):
     rom_zip = max(zips, key=lambda f: re.search(r'\d{8}', f).group())
     major_version = re.findall(r'\d+\.\d+', rom_zip)[-1]
     build_date = re.search(r'\d{8}', rom_zip).group()
-    upload_path=f"{rom}/{device}/{android_version}/{major_version}/{build_date}"
+    upload_path=f"onelots-builds-bucket/{rom}/{device}/{android_version}/{major_version}/{build_date}"
     install_images = config[device]["install_images"]
     install_images = [img.strip() for img in install_images.split(",")]
 
@@ -133,7 +133,7 @@ def upload_device(device):
     for image in install_images:
         if not image.endswith(".zip"):
             image = f"{image}.img"
-        subprocess.run(["rclone", "copy", f"{out}/{image}", f"cloudflare-onelots:{upload_path}", "-P"])
+        subprocess.run(["rclone", "copy", f"{out}/{image}", f"bunnycdn:{upload_path}", "-P"])
     zip_path = f"{out}/{rom_zip}"
     send_webhook(rom, major_version, upload_path, device, zip_path)
 
