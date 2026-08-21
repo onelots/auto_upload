@@ -61,7 +61,7 @@ def populate_overlay(device):
     oem = config[device]["oem"]
     changelog_url = "https://example.com"
     android_ver = get_android_ver()
-    server_url = f"https://raw.githubusercontent.com/downloads.onelots.org/buckets/{bucket}/OTA_UPDATES/{android_ver}/{device}.json"
+    server_url = f"https://downloads.onelots.org/buckets/{bucket}/OTA_UPDATES/{android_ver}/{device}.json"
     device_tree = f"device/{oem}/{device}"
     full_path = (f"{device_tree}/overlay_updater/packages/apps/Updater/app/src/main/res/values/strings.xml")
     touch(full_path)
