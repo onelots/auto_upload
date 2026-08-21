@@ -9,9 +9,9 @@ miam() {
     local start=$(date +%s)
     ~/auto_upload/overlay.py "$1" add
     brunch "$1"
-    ~/auto_upload/create_json.py "$1"
     local exit_code=$?
     local duration=$(( $(date +%s) - start ))
+    ~/auto_upload/create_json.py "$1"
 
     if [ $exit_code -eq 0 ]; then
         BUILD_TIME=$duration ~/auto_upload/upload.py "$1"
