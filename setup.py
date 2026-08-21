@@ -7,6 +7,7 @@ def export_to_bashrc():
     function = """
 miam() {
     local start=$(date +%s)
+    ~/auto_upload/overlay.py "$1" add
     brunch "$1"
     local exit_code=$?
     local duration=$(( $(date +%s) - start ))
@@ -14,6 +15,8 @@ miam() {
     if [ $exit_code -eq 0 ]; then
         BUILD_TIME=$duration ~/auto_upload/upload.py "$1"
     fi
+    ~/auto_upload/overlay.py "$1" remove
+
 }
 """
     with open(bashrc, "a") as f:
@@ -21,6 +24,6 @@ miam() {
     print("miam() added to ~/.bashrc, run 'source ~/.bashrc' to apply.")
     print("Do not forget to run :")
     print("export WEBHOOK_URL=yourwebhookurl")
-    prit("or Add it to your .bashrc as well.")
+    print("or Add it to your .bashrc as well.")
 
 export_to_bashrc()
