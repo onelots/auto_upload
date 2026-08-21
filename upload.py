@@ -120,7 +120,7 @@ def send_webhook(rom, version, upload_path, device, rom_zip):
 
 def upload_device(device):
     rom = config[device]["rom"]
-    android_version = get_android_ver(device)
+    android_version = get_android_ver()
     zips = [f for f in os.listdir(out) if f.endswith(".zip") and "ota" not in f]
     rom_zip = max(zips, key=lambda f: re.search(r'\d{8}', f).group())
     major_version = re.findall(r'\d+\.\d+', rom_zip)[-1]
