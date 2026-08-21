@@ -68,9 +68,9 @@ def populate_overlay(device):
     write_updater_strings(full_path, server_url, changelog_url, device)
 
 
-def populate_overlay_path(lineage_path):
+def populate_overlay_path(lineage_path, device, oem):
     with open(lineage_path, "a", encoding="utf-8") as f:
-        f.write(f"\nDEVICE_PACKAGE_OVERLAYS += $(COMMON_PATH)/overlay_updater")
+        f.write(f"\nDEVICE_PACKAGE_OVERLAYS += device/{oem}/{device}/overlay_updater")
 
 def nuke_overlay(device, oem):
     device_tree = f"device/{oem}/{device}"
@@ -97,7 +97,7 @@ def main():
     oem = config[device]["oem"]
     if sys.argv[2] == "add":
         populate_overlay(device)
-        populate_overlay_path(f"device/{oem}/{device}/lineage_{device}.mk")
+        populate_overlay_path(f"device/{oem}/{device}/lineage_{device}.mk", device, oem)
     elif sys.argv[2] == "remove":
         nuke_overlay(device, oem)
 main()
