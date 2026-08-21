@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import configparser
 import sys
+from upload import get_android_ver
 
 top = os.getenv("ANDROID_BUILD_TOP")
 rom_folder = top.split("/")[-1]
@@ -12,6 +13,7 @@ config = configparser.ConfigParser()
 config.read(devices_conf)
 devices = config.sections()
 overlay = "updater_overlay"
+pwd = os.getenv("PWD")
 
 def touch(f):
     Path(f).parent.mkdir(parents=True, exist_ok=True)
@@ -57,7 +59,8 @@ def populate_overlay(device):
     rom_ver = rom_folder.lower()
     oem = config[device]["oem"]
     changelog_url = "https://example.com"
-    server_url = f"https://raw.githubusercontent.com/downloads.onelots.org/buckets/{bucket}/{rom_ver}/{device}.json"
+    android_ver = get_android_ver()
+    server_url = f"https://raw.githubusercontent.com/downloads.onelots.org/buckets/{bucket}/OTA_UPDATES/{android_ver}/{device}.json"
     device_tree = f"device/{oem}/{device}"
     full_path = (f"{device_tree}/overlay_updater/packages/apps/Updater/app/src/main/res/values/strings.xml")
     touch(full_path)

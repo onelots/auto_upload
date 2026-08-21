@@ -49,7 +49,7 @@ def check_conf():
         sys.exit(1)
     print("Device configuration found, proceed.")
 
-def get_android_ver(device):
+def get_android_ver():
     rom = top.split("/")[-1]
     if "lineage" in rom:
         if "lineage-18" in pwd:
@@ -136,6 +136,8 @@ def upload_device(device):
             image = f"{image}.img"
         subprocess.run(["rclone", "copy", f"{out}/{image}", f"bunnycdn:{upload_path}", "-P"])
     zip_path = f"{out}/{rom_zip}"
+    json_upload_path = f"{rom}/OTA_UPDATES/{android_version}/{device}.json"
+    subprocess.run(["rclone", "copy", f"{out}/{device}.json", f"bunnycdn:{json_upload_path}", "-P"])
     send_webhook(rom, major_version, upload_path, device, zip_path)
 
 def read_device_config_file(file_path, built):
