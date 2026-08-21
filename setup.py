@@ -9,6 +9,7 @@ miam() {
     local start=$(date +%s)
     ~/auto_upload/overlay.py "$1" add
     brunch "$1"
+    ~/auto_upload/create_json.py "$1"
     local exit_code=$?
     local duration=$(( $(date +%s) - start ))
 

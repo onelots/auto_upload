@@ -4,85 +4,31 @@
 # SPDX-FileCopyrightText: 2025 The Evolution X Project
 # SPDX-License-Identifier: Apache-2.0
 
-import argparse
 import os
+import sys
 import hashlib
 import json
+import datetime
+import re
+import configparser
+from upload import get_android_ver
 
-def generate_json(target_device, product_out, file_name, build_variant, with_gms):
-    output = os.path.join(product_out, f"{target_device}.json")
+devices_conf = os.path.expanduser("~/auto_upload/devices.conf")
+config = configparser.ConfigParser()
+config.read(devices_conf)
+devices = config.sections()
+pwd = os.getenv("PWD")
+out = os.getenv("ANDROID_PRODUCT_OUT")
+top = os.getenv("ANDROID_BUILD_TOP")
+rom_folder = top.split("/")[-1] if top else ""
 
-    if os.path.exists(output):
-        os.remove(output)
 
-    android_version = file_name.split('-')[1].split('.')[0] + ("_vanilla" if with_gms == "false" else "")
-    existing_ota_json = os.path.join(f"./evolution/OTA{'-VANILLA' if with_gms == 'false' else ''}/builds", f"{target_device}.json")
+def get_rom():
+    if "lineage" in rom_folder:
+        return "lineageos"
+    elif "evo" in rom_folder.lower():
+        return "evolution-x"
 
-    maintainer = ""
-    currently_maintained = False
-    oem = ""
-    device = ""
-    forum = ""
-    firmware = ""
-    paypal = ""
-    github = ""
-    initial_installation_images = []
-    extra_images = []
-
-    if os.path.exists(existing_ota_json):
-        with open(existing_ota_json, 'r') as f:
-            ota_data = json.load(f)
-        response_data = ota_data["response"][0]
-        maintainer = response_data.get("maintainer", "")
-        currently_maintained = response_data.get("currently_maintained", False)
-        oem = response_data.get("oem", "")
-        device = response_data.get("device", "")
-        forum = response_data.get("forum", "")
-        firmware = response_data.get("firmware", "")
-        paypal = response_data.get("paypal", "")
-        github = response_data.get("github", "")
-        initial_installation_images = response_data.get("initial_installation_images", [])
-        extra_images = response_data.get("extra_images", [])
-
-    filename = file_name
-    if "Official" in file_name:
-        download = f"https://cdn.evolution-x.org/{target_device}/{android_version}/{file_name}/download"
-    else:
-        download = f"https://sourceforge.net/projects/your_unoffical_sourceforge_project/files/{target_device}/{android_version}/{file_name}/download"
-    version = file_name.split('-')[4]
-    buildprop = os.path.join(product_out, "system", "build.prop")
-    timestamp = get_timestamp_from_buildprop(buildprop)
-    md5 = get_checksum(os.path.join(product_out, file_name), 'md5')
-    sha256 = get_checksum(os.path.join(product_out, file_name), 'sha256')
-    size = os.path.getsize(os.path.join(product_out, file_name))
-
-    json_data = {
-        "response": [
-            {
-                "maintainer": maintainer,
-                "currently_maintained": currently_maintained,
-                "oem": oem,
-                "device": device,
-                "filename": filename,
-                "download": download,
-                "timestamp": timestamp,
-                "md5": md5,
-                "sha256": sha256,
-                "size": size,
-                "version": version,
-                "buildtype": build_variant,
-                "forum": f"{forum}" if forum else "",
-                "firmware": f"{firmware}" if firmware else "",
-                "paypal": f"{paypal}" if paypal else "",
-                "github": github,
-                "initial_installation_images": initial_installation_images,
-                "extra_images": extra_images
-            }
-        ]
-    }
-
-    with open(output, 'w') as f:
-        json.dump(json_data, f, indent=2)
 
 def get_timestamp_from_buildprop(buildprop_path):
     with open(buildprop_path, 'r') as f:
@@ -91,11 +37,13 @@ def get_timestamp_from_buildprop(buildprop_path):
                 return int(line.split('=')[1].strip())
     return 0
 
+
 def get_checksum(file_path, checksum_type='md5'):
     if checksum_type == 'md5':
         return calculate_md5(file_path)
     elif checksum_type == 'sha256':
         return calculate_sha256(file_path)
+
 
 def calculate_md5(file_path):
     hash_md5 = hashlib.md5()
@@ -104,6 +52,7 @@ def calculate_md5(file_path):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
 
+
 def calculate_sha256(file_path):
     hash_sha256 = hashlib.sha256()
     with open(file_path, "rb") as f:
@@ -111,16 +60,98 @@ def calculate_sha256(file_path):
             hash_sha256.update(chunk)
     return hash_sha256.hexdigest()
 
-def main():
-    parser = argparse.ArgumentParser(description="Generate a JSON file for OTA.")
-    parser.add_argument("target_device", help="Target device name")
-    parser.add_argument("product_out", help="Product output directory")
-    parser.add_argument("file_name", help="File name for OTA")
-    parser.add_argument("build_variant", help="Build variant")
-    parser.add_argument("with_gms", help="Whether with GMS (true/false)")
 
-    args = parser.parse_args()
-    generate_json(args.target_device, args.product_out, args.file_name, args.build_variant, args.with_gms)
+def generate_json(target_device):
+    oem = config[target_device]["oem"]
+    install_images = config[target_device]["install_images"]
+    install_images = [img.strip() for img in install_images.split(",")]
+
+    product_out = out
+    output = os.path.join(product_out, f"{target_device}.json")
+
+    zips = [f for f in os.listdir(product_out) if f.endswith(".zip") and "ota" not in f]
+    if not zips:
+        print(f"Error: no zip found in {product_out}")
+        sys.exit(1)
+
+    filename = max(zips, key=lambda f: re.search(r'\d{8}', f).group())
+    build_date = re.search(r'\d{8}', filename).group()
+    version = re.findall(r'\d+\.\d+', filename)[-1]
+
+    rom = get_rom()
+    android_version = get_android_ver()
+    download_link = (
+        "https://downloads.onelots.org/buckets/"
+        f"onelots-builds-bucket/{rom}/{target_device}/{version}/{android_version}/{build_date}"
+    )
+
+    maintainer = "Onelots"
+    currently_maintained = False
+    github = ""
+    extra_images = []
+
+    if os.path.exists(output):
+        with open(output, 'r') as f:
+            ota_data = json.load(f)
+        response_data = ota_data["response"][0]
+        maintainer = response_data.get("maintainer", maintainer)
+        currently_maintained = response_data.get("currently_maintained", currently_maintained)
+        github = response_data.get("github", github)
+        extra_images = response_data.get("extra_images", extra_images)
+
+    file_path = os.path.join(product_out, filename)
+    buildprop = os.path.join(product_out, "system", "build.prop")
+    timestamp = get_timestamp_from_buildprop(buildprop) or int(datetime.datetime.now().timestamp())
+
+    md5 = get_checksum(file_path, 'md5')
+    sha256 = get_checksum(file_path, 'sha256')
+    size = os.path.getsize(file_path)
+
+    json_data = {
+        "response": [
+            {
+                "maintainer": maintainer,
+                "currently_maintained": currently_maintained,
+                "oem": oem,
+                "device": target_device,
+                "filename": filename,
+                "download": download_link,
+                "timestamp": timestamp,
+                "md5": md5,
+                "sha256": sha256,
+                "size": size,
+                "version": version,
+                "buildtype": "userdebug",
+                "forum": "https://discord.onelots.org",
+                "firmware": "",
+                "paypal": "https://paypal.me/0nel0ts",
+                "github": github or "https://github.com/Onelots",
+                "initial_installation_images": install_images,
+                "extra_images": extra_images
+            }
+        ]
+    }
+
+    with open(output, 'w') as f:
+        json.dump(json_data, f, indent=2)
+
+    print(f"{target_device}.json correctly generated.")
+
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: ./create_json.py <device>")
+        sys.exit(1)
+
+    target_device = sys.argv[1]
+
+    if target_device not in devices:
+        print(f"Error: '{target_device}' not found in {devices_conf}")
+        print(f"Available devices: {', '.join(devices)}")
+        sys.exit(1)
+
+    generate_json(target_device)
+
 
 if __name__ == "__main__":
     main()
