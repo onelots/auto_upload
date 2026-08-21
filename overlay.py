@@ -13,7 +13,6 @@ devices_conf = os.path.expanduser("~/auto_upload/devices.conf")
 config = configparser.ConfigParser()
 config.read(devices_conf)
 devices = config.sections()
-overlay = "updater_overlay"
 pwd = os.getenv("PWD")
 
 def touch(f):
@@ -82,6 +81,12 @@ def nuke_overlay(device, oem):
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"Removed last 2 lines from {device_tree}/lineage_{device}.mk")
 
+def check_existing_overlay(oem, device):
+    if Path(f"device/{oem}/{device}/overlay_updater/").is_dir():
+        return True
+    else:
+        return False
+
 def main():
     if len(sys.argv) < 3:
         print("Usage: script.py <device>")
@@ -96,8 +101,11 @@ def main():
 
     oem = config[device]["oem"]
     if sys.argv[2] == "add":
-        populate_overlay(device)
-        populate_overlay_path(f"device/{oem}/{device}/lineage_{device}.mk", device, oem)
+        if not check_existing_overlay(oem, device):
+            populate_overlay(device)
+            populate_overlay_path(f"device/{oem}/{device}/lineage_{device}.mk", device, oem)
+        else:
+            print("Build was likely aborted, stay that way.")
     elif sys.argv[2] == "remove":
         nuke_overlay(device, oem)
 main()
