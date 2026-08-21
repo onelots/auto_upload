@@ -21,5 +21,6 @@ miam() {
     print("miam() added to ~/.bashrc, run 'source ~/.bashrc' to apply.")
     print("Do not forget to run :")
     print("export WEBHOOK_URL=yourwebhookurl")
+    prit("or Add it to your .bashrc as well.")
 
 export_to_bashrc()
