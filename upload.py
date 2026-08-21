@@ -50,7 +50,7 @@ def check_conf():
     print("Device configuration found, proceed.")
 
 def get_android_ver(device):
-    rom = config[device]["rom"]
+    rom = top.split("/")[-1]
     if "lineage" in rom:
         if "lineage-18" in pwd:
             aver = 11
@@ -66,13 +66,14 @@ def get_android_ver(device):
             aver = 16
         if "lineage-24" in pwd:
             aver = 17
-    if "evolution-x" in rom:
-        if "10" in pwd:
-            aver = 15
-        if "11" in pwd:
-            aver = 16
-        if "12" in pwd:
-            aver = 17
+    else:
+        if "evo" or "Evo" in rom:
+            if "10" in pwd:
+                aver = 15
+            if "11" in pwd:
+                aver = 16
+            if "12" in pwd:
+                aver = 17
 
     return int(aver)
 
