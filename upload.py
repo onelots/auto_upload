@@ -157,4 +157,5 @@ def main():
     check_conf()
     read_device_config_file(devices_conf, built)
 
-main()
+if __name__ == "__main__":
+    main()
