@@ -26,8 +26,7 @@ def get_rom():
         return "evolution-x"
 
 def write_updater_strings(filepath, server_url, changelog_url, device):
-    content = f'''
-<?xml version="1.0" encoding="utf-8"?>
+    content = f'''<?xml version="1.0" encoding="utf-8"?>
 <!--
 Copyright (C) 2017-2024 The LineageOS Project
 
