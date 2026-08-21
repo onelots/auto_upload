@@ -5,6 +5,7 @@ from pathlib import Path
 import configparser
 import sys
 from upload import get_android_ver
+import shutil
 
 top = os.getenv("ANDROID_BUILD_TOP")
 rom_folder = top.split("/")[-1]
@@ -71,8 +72,15 @@ def populate_overlay_path(lineage_path):
     with open(lineage_path, "a", encoding="utf-8") as f:
         f.write(f"\nDEVICE_PACKAGE_OVERLAYS += $(COMMON_PATH)/overlay_updater")
 
-def to_do():
-    print("Needs to be written")
+def nuke_overlay(device, oem):
+    device_tree = f"device/{oem}/{device}"
+    shutil.rmtree(f"{device_tree}/overlay_updater")
+
+    path = Path(f"{device_tree}/lineage_{device}.mk")
+    lines = path.read_text(encoding="utf-8").splitlines()
+    lines = lines[:-2]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"Removed last 2 lines from {device_tree}/lineage_{device}.mk")
 
 def main():
     if len(sys.argv) < 3:
@@ -91,5 +99,5 @@ def main():
         populate_overlay(device)
         populate_overlay_path(f"device/{oem}/{device}/lineage_{device}.mk")
     elif sys.argv[2] == "remove":
-        to_do()
+        nuke_overlay(device, oem)
 main()
