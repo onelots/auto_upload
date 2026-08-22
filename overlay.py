@@ -98,6 +98,10 @@ def main():
         print(f"Available devices: {', '.join(devices)}")
         sys.exit(1)
 
+    if get_rom():
+        print("Skip EvolutionX")
+        sys.exit(1)
+
     oem = config[device]["oem"]
     if sys.argv[2] == "add":
         if not check_existing_overlay(oem, device):
