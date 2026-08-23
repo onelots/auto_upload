@@ -136,7 +136,7 @@ def upload_device(device):
             image = f"{image}.img"
         subprocess.run(["rclone", "copy", f"{out}/{image}", f"bunnycdn:{upload_path}", "-P"])
     zip_path = f"{out}/{rom_zip}"
-    json_upload_path = f"{rom}/OTA_UPDATES/{android_version}/{device}.json"
+    json_upload_path = f"onelots-builds-bucket/{rom}/OTA_UPDATES/{android_version}/{device}.json"
     subprocess.run(["rclone", "copy", f"{out}/{device}.json", f"bunnycdn:{json_upload_path}", "-P"])
     send_webhook(rom, major_version, upload_path, device, zip_path)
 
