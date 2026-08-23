@@ -100,7 +100,7 @@ def main():
 
     if get_rom():
         print("Skip EvolutionX")
-        sys.exit(1)
+        sys.exit(0)
 
     oem = config[device]["oem"]
     if sys.argv[2] == "add":
