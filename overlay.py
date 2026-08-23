@@ -98,7 +98,7 @@ def main():
         print(f"Available devices: {', '.join(devices)}")
         sys.exit(1)
 
-    if get_rom():
+    if get_rom() == "evolution-x":
         print("Skip EvolutionX")
         sys.exit(0)
 
