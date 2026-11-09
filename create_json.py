@@ -107,30 +107,52 @@ def generate_json(target_device):
     sha256 = get_checksum(file_path, 'sha256')
     size = os.path.getsize(file_path)
 
-    json_data = {
-        "response": [
+    if rom == "lineageos":
+        json_data = [
             {
-                "maintainer": maintainer,
-                "currently_maintained": currently_maintained,
-                "oem": oem,
-                "device": target_device,
+                "datetime": timestamp,
                 "filename": filename,
-                "download": download_link,
-                "timestamp": timestamp,
-                "md5": md5,
-                "sha256": sha256,
+                "id": sha256,
+                "romtype": "unofficial",
                 "size": size,
+                "url": download_link,
                 "version": version,
-                "buildtype": "userdebug",
-                "forum": "https://discord.onelots.org",
-                "firmware": "",
-                "paypal": "https://paypal.me/0nel0ts",
-                "github": github or "https://github.com/Onelots",
-                "initial_installation_images": install_images,
-                "extra_images": extra_images
+                "type": "unofficial",
+                "files": [
+                    {
+                        "filename": filename,
+                        "sha256": sha256,
+                        "size": size,
+                        "url": download_link
+                    }
+                ]
             }
         ]
-    }
+    else:
+        json_data = {
+            "response": [
+                {
+                    "maintainer": maintainer,
+                    "currently_maintained": currently_maintained,
+                    "oem": oem,
+                    "device": target_device,
+                    "filename": filename,
+                    "download": download_link,
+                    "timestamp": timestamp,
+                    "md5": md5,
+                    "sha256": sha256,
+                    "size": size,
+                    "version": version,
+                    "buildtype": "userdebug",
+                    "forum": "https://discord.onelots.org",
+                    "firmware": "",
+                    "paypal": "https://paypal.me/0nel0ts",
+                    "github": github or "https://github.com/Onelots",
+                    "initial_installation_images": install_images,
+                    "extra_images": extra_images
+                }
+            ]
+        }
 
     with open(output, 'w') as f:
         json.dump(json_data, f, indent=2)
