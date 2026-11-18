@@ -93,7 +93,9 @@ def generate_json(target_device):
     if os.path.exists(output):
         with open(output, 'r') as f:
             ota_data = json.load(f)
-        response_data = ota_data["response"][0]
+        # LineageOS format is a bare list, Evolution X wraps it in {"response": [...]}
+        entries = ota_data["response"] if isinstance(ota_data, dict) else ota_data
+        response_data = entries[0] if entries else {}
         maintainer = response_data.get("maintainer", maintainer)
         currently_maintained = response_data.get("currently_maintained", currently_maintained)
         github = response_data.get("github", github)
