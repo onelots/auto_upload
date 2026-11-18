@@ -134,7 +134,8 @@ def upload_device(device):
     for image in install_images:
         if not image.endswith(".zip"):
             image = f"{image}.img"
-        subprocess.run(["rclone", "copy", f"{out}/{image}", f"bunnycdn:{upload_path}", "-P"])
+        # Bunny S3 rejects CompleteMultipartUpload (MalformedXML) with too many 5M parts
+        subprocess.run(["rclone", "copy", f"{out}/{image}", f"bunnycdn:{upload_path}", "--s3-chunk-size", "128M", "-P"])
     zip_path = f"{out}/{rom_zip}"
     json_upload_path = f"onelots-builds-bucket/{rom}/OTA_UPDATES/{android_version}/{device}.json"
     subprocess.run(["rclone", "copyto", f"{out}/{device}.json", f"bunnycdn:{json_upload_path}", "-P"])
