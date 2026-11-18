@@ -59,7 +59,7 @@ def populate_overlay(device):
     oem = config[device]["oem"]
     changelog_url = "https://example.com"
     android_ver = get_android_ver()
-    server_url = f"https://downloads.onelots.org/buckets/{bucket}/OTA_UPDATES/{android_ver}/{device}.json"
+    server_url = f"https://downloads.onelots.org/download/buckets/onelots-builds-bucket/{bucket}/OTA_UPDATES/{android_ver}/{device}.json"
     device_tree = f"device/{oem}/{device}"
     # Standard AOSP overlay path
     full_path_res = f"{device_tree}/overlay_updater/packages/apps/Updater/res/values/strings.xml"
@@ -74,7 +74,7 @@ def populate_overlay(device):
 def populate_overlay_path(lineage_path, device, oem):
     bucket = get_rom()
     android_ver = get_android_ver()
-    server_url = f"https://downloads.onelots.org/buckets/{bucket}/OTA_UPDATES/{android_ver}/{device}.json"
+    server_url = f"https://downloads.onelots.org/download/buckets/onelots-builds-bucket/{bucket}/OTA_UPDATES/{android_ver}/{device}.json"
     with open(lineage_path, "a", encoding="utf-8") as f:
         f.write(f"\nDEVICE_PACKAGE_OVERLAYS += device/{oem}/{device}/overlay_updater\n")
 
