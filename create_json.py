@@ -38,6 +38,14 @@ def get_timestamp_from_buildprop(buildprop_path):
     return 0
 
 
+def get_buildprop(buildprop_path, key):
+    with open(buildprop_path, 'r') as f:
+        for line in f:
+            if line.startswith(key + "="):
+                return line.split('=', 1)[1].strip()
+    return None
+
+
 def get_checksum(file_path, checksum_type='md5'):
     if checksum_type == 'md5':
         return calculate_md5(file_path)
@@ -123,6 +131,8 @@ def generate_json(target_device):
                 "files": [
                     {
                         "filename": filename,
+                        "os_patch_level": get_buildprop(buildprop, "ro.build.version.security_patch"),
+                        "os_sdk_level": int(get_buildprop(buildprop, "ro.build.version.sdk")),
                         "sha256": sha256,
                         "size": size,
                         "url": download_link
