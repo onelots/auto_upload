@@ -77,9 +77,9 @@ def get_android_ver():
 
     return int(aver)
 
-def send_webhook(rom, version, upload_path, device, rom_zip):
+def send_webhook(rom, version, device, rom_zip):
     webhook_url = os.getenv("WEBHOOK_URL")
-    download_url = "https://downloads.onelots.org/buckets/" + upload_path
+    download_url = f"https://downloads.onelots.org/roms/{rom}/{device}/"
     rom_capitalized = roms_informations["roms_capitalized"][rom]
     if "lineageos" in rom:
         version = "lineageos-" + version
@@ -139,7 +139,7 @@ def upload_device(device):
     zip_path = f"{out}/{rom_zip}"
     json_upload_path = f"onelots-builds-bucket/{rom}/OTA_UPDATES/{android_version}/{device}.json"
     subprocess.run(["rclone", "copyto", f"{out}/{device}.json", f"bunnycdn:{json_upload_path}", "-P"])
-    send_webhook(rom, major_version, upload_path, device, zip_path)
+    send_webhook(rom, major_version, device, zip_path)
 
 def read_device_config_file(file_path, built):
     config.read(file_path)
