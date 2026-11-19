@@ -77,7 +77,6 @@ def populate_overlay_path(lineage_path, device, oem):
     server_url = f"https://downloads.onelots.org/buckets/{bucket}/OTA_UPDATES/{android_ver}/{device}.json"
     with open(lineage_path, "a", encoding="utf-8") as f:
         f.write(f"\nDEVICE_PACKAGE_OVERLAYS += device/{oem}/{device}/overlay_updater\n")
-        f.write(f"PRODUCT_PROPERTY_OVERRIDES += lineage.updater.uri={server_url}\n")
 
 def nuke_overlay(device, oem):
     device_tree = f"device/{oem}/{device}"
