@@ -81,8 +81,8 @@ def generate_json(target_device):
     rom = get_rom()
     android_version = get_android_ver()
     download_link = (
-        "https://downloads.onelots.org/buckets/"
-        f"onelots-builds-bucket/{rom}/{target_device}/{version}/{android_version}/{build_date}/{filename}"
+        "https://downloads.onelots.org/download/buckets/"
+        f"onelots-builds-bucket/{rom}/{target_device}/{android_version}/{version}/{build_date}/{filename}"
     )
 
     maintainer = "Onelots"
